@@ -1,38 +1,75 @@
 .App {
+  background-color: #282c34;
+  background-image:  url(./images/main.jpeg);
+  background-position: center;
+  background-size: cover;
+  color: white;
+  height: 100vh;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.camera-buttons {
+  position: absolute;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.camera {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  justify-content: flex-end;
+  height: 100vh;
 }
 
-.App-link {
-  color: #61dafb;
+.video {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+footer {
+  bottom: 0;
+}
+
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100vh;
+}
+
+.form-container {
+  margin: 3rem 0;
+  padding: 2rem 1rem;
+  background-color: #ffffffd6;
+  color: #2c2d30;
+}
+
+.form-field {
+  margin: 1.6rem 0;
+}
+
+.form-input {
+  border: 1px solid rgba(241, 78, 149, 0.8);
+  background-color: transparent;
+  height: 2rem;
+  width: 100%;
+}
+
+.form-input:focus-visible {
+  outline: 1px  solid rgba(241, 78, 149, 0.8);
+}
+
+.button{
+  background-color: rgba(241, 78, 149, 0.8);
+  border-color: transparent;
+  border-radius: 50%;
+  color: #fff;
+  font-family: 'Sacramento', Arial, serif;
+  font-weight: 900;
+  font-size: 2rem;
+  line-height: 4.4rem;
+  margin: 1rem;
+  height: 4rem;
+  width: 4rem;
 }
