@@ -3,14 +3,15 @@ import { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { useOrientationEvent } from "./useOrientationEvent";
 
-type Props = {
+type CameraProps = {
   onUploadPhoto: (imageSrc: Blob) => void;
   organizer: string;
 };
 
-function Camera({ onUploadPhoto, organizer }: Props) {
+function Camera({ onUploadPhoto, organizer }: CameraProps) {
   const videoRef = useRef<Webcam & HTMLVideoElement>(null);
   const [photo, setPhoto] = useState<string | null>(null);
+  const [facingMode, setFacingMode] = useState<string>("user");
   const [error, setError] = useState<boolean>(false);
   const [capturing, setCapturing] = useState(true);
   const [size, setSize] = useState({
@@ -25,18 +26,27 @@ function Camera({ onUploadPhoto, organizer }: Props) {
     setCapturing(false);
   }, [videoRef, setPhoto]);
 
+  const rotateCamara = () => {
+    facingMode === "user"
+      ? setFacingMode("environment")
+      : setFacingMode("user");
+    console.log({ facingMode });
+  };
+
   const uploadPhoto = () => {
-    if (photo){
+    if (photo) {
       const canvas = videoRef.current?.getCanvas();
-      new Promise(resolve => canvas?.toBlob(resolve, 'image/jpeg')).then((image) => {
-        onUploadPhoto(image as Blob);
-        setPhoto(null);
-        setCapturing(true);
-      })
+      new Promise((resolve) => canvas?.toBlob(resolve, "image/jpeg")).then(
+        (image) => {
+          onUploadPhoto(image as Blob);
+          setPhoto(null);
+          setCapturing(true);
+        }
+      );
     }
   };
 
-  const removePhoto = () => {
+  const discardPhoto = () => {
     setPhoto(null);
     setCapturing(true);
   };
@@ -50,12 +60,12 @@ function Camera({ onUploadPhoto, organizer }: Props) {
 
   const videoConstraints = {
     ...size,
-    facingMode: "user",
+    facingMode,
   };
 
   return (
     <section className="camera">
-       <Webcam
+      <Webcam
         ref={videoRef}
         screenshotFormat="image/jpeg"
         onUserMediaError={() => setError(true)}
@@ -63,24 +73,52 @@ function Camera({ onUploadPhoto, organizer }: Props) {
         className="video"
         audio={false}
         videoConstraints={videoConstraints}
-        />
-      {photo && <img src={photo || ""} alt="hola" style={{position: 'absolute'}}></img> } 
+      />
+      {photo && (
+        <img
+          src={photo || ""}
+          alt="hola"
+          style={{ position: "absolute" }}
+        ></img>
+      )}
       <div className="camera-buttons">
         {capturing ? (
-          <button id="snap" className="button" onClick={capture}>
-            <i className="fa-solid fa-camera"></i>
-          </button>
+          <>
+            <button aria-label="capture" className="button" onClick={capture}>
+              <i className="fa-solid fa-camera"></i>
+            </button>
+            <button
+              aria-label="rotate"
+              className="button"
+              onClick={rotateCamara}
+            >
+              <i className="fa-solid fa-camera-rotate"></i>
+            </button>
+          </>
         ) : (
           <>
-            <button id="delete" className="button" onClick={removePhoto}>
+            <button
+              aria-label="discard"
+              className="button"
+              onClick={discardPhoto}
+            >
               <i className="fa-solid fa-xmark"></i>
             </button>
-            <button id="send" className="button" onClick={uploadPhoto}>
+            <button
+              aria-label="submit"
+              className="button"
+              onClick={uploadPhoto}
+            >
               <i className="fa-solid fa-paper-plane"></i>
             </button>
           </>
         )}
-        {error && <p>Para poder continuar tienes que darnoss permiso para acceder a tu camara, si no sabes hacerlo contacta con {organizer} </p>}
+        {error && (
+          <p>
+            Para poder continuar tienes que darnos permiso para acceder a tu
+            camara, si no sabes hacerlo contacta con {organizer}{" "}
+          </p>
+        )}
       </div>
     </section>
   );
