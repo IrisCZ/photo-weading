@@ -8,16 +8,65 @@ import { useLocalStorage } from "./useLocalStorage";
 import { useEffect, useState } from "react";
 
 function App() {
+  const [photoGallery, setPhotoGallery] = useState({
+    data: "",
+    error: false,
+    key: "",
+  });
+  const [key, setKey] = useLocalStorage("photo-key", "");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const url = `/next-photo?lastPhoto=${key || ""}`;
+      fetch(url)
+        .then((result) => result.json())
+        .then((newData: { link: string; key: string }) => {
+          setPhotoGallery({
+            data: newData.link,
+            error: false,
+            key: newData.key,
+          });
+          setKey(newData.key);
+        })
+        .catch(function (error) {
+          console.log(error);
+          setPhotoGallery({ data: "", error: true, key: "" });
+        });
+    }, 8000);
+    return () => {
+      clearInterval(interval);
+    };
+  });
+
   return (
     <main className="App">
       <Router>
         <Routes>
           <Route path="/" element={UserCamera()} />
+          <Route path="/gallery" element={Gallery(photoGallery.data)} />
         </Routes>
       </Router>
     </main>
   );
 }
+
+export default App;
+
+export const Gallery = (data: string) => (
+  <section className="gallery">
+    {data ? (
+      <img
+        className="gallery-image"
+        alt="gallery"
+        src={data}
+        aria-label="gallery-image"
+      />
+    ) : (
+      <Loading title="loader" />
+    )}
+  </section>
+);
+
 export const UserCamera = () => {
   const organizer = "Sara y Celes";
   const [name, setName] = useLocalStorage("name", "");
@@ -46,23 +95,23 @@ export const UserCamera = () => {
           body: photoSrc,
         })
           .then((response) => {
-          if (response.status === 200) {
+            if (response.status === 200) {
               console.log("ENVIADO!!!");
-      }
-    })
+            }
+          })
           .catch(() => {
             alert("ERROR");
           });
-  }
+      }
     });
   };
 
   return name ? (
-        <Camera
-          onUploadPhoto={handleUploadPhoto}
-          organizer={organizer ? organizer : "el organizador de la boda"}
-        />
-      ) : (
+    <Camera
+      onUploadPhoto={handleUploadPhoto}
+      organizer={organizer ? organizer : "el organizador de la boda"}
+    />
+  ) : (
     <Welcome onSubmitInfo={handleSubmit} organizer={organizer} />
   );
 };

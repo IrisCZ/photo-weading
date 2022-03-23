@@ -1,12 +1,14 @@
 .App {
   background-color: #282c34;
-  background-image:  url(./images/main.jpeg);
-  background-position: center;
-  background-size: cover;
   color: white;
-  height: 100vh;
   text-align: center;
 }
+
+footer {
+  bottom: 0;
+}
+
+/* ## Camera Section */
 
 .camera-buttons {
   position: absolute;
@@ -26,16 +28,15 @@
   width: 100vw;
 }
 
-footer {
-  bottom: 0;
-}
-
 .welcome {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   height: 100vh;
+  background-image: url(./images/main.jpeg);
+  background-position: center;
+  background-size: cover;
 }
 
 .form-container {
@@ -57,19 +58,37 @@ footer {
 }
 
 .form-input:focus-visible {
-  outline: 1px  solid rgba(241, 78, 149, 0.8);
+  outline: 1px solid rgba(241, 78, 149, 0.8);
 }
 
-.button{
+.button {
   background-color: rgba(241, 78, 149, 0.8);
   border-color: transparent;
   border-radius: 50%;
   color: #fff;
-  font-family: 'Sacramento', Arial, serif;
+  font-family: "Sacramento", Arial, serif;
   font-weight: 900;
   font-size: 2rem;
   line-height: 4.4rem;
   margin: 1rem;
   height: 4rem;
   width: 4rem;
+}
+
+/* ## Gallery Section */
+
+.gallery {
+  /* background-image: url(./images/saveTheDate.jpeg); */
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  background-position: center;
+  background-size: cover;
+  height: 100vh;
+}
+
+.gallery-image {
+  align-self: center;
+  max-height: 100%;
+  max-width: 100%;
 }
