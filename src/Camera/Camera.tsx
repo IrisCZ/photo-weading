@@ -1,7 +1,7 @@
-import "./App.css";
+import "../App.css";
 import { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
-import { useOrientationEvent } from "./useOrientationEvent";
+import { useOrientationEvent } from "../useOrientationEvent";
 
 type CameraProps = {
   onUploadPhoto: (imageSrc: Blob) => void;

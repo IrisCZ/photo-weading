@@ -1,13 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { LocalStorageMock } from "./localStorageMock";
+import { LocalStorageMock } from "../test-helper/localStorageMock";
+import CameraWrapper from "./CameraWrapper";
+import { Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
-import App, { Gallery } from "../App";
-import { Route, Router, Routes } from "react-router-dom";
 
 global.localStorage = new LocalStorageMock();
 
-describe("UserCamera", () => {
+describe("CameraWrapper", () => {
   Object.defineProperty(HTMLMediaElement.prototype, "muted", {
     set: () => {},
   }); // mutes Webcam Warning: unstable_flushDiscreteUpdates: Cannot flush updates when React is already rendering.
@@ -17,14 +17,15 @@ describe("UserCamera", () => {
   });
 
   it("renders welcome text", () => {
-    render(<App />);
+    renderCamera();
     const welcomeElement = screen.getByText(/bienvenidos a/i);
 
     expect(welcomeElement).toBeInTheDocument();
   });
 
   it("sets name in local storage", () => {
-    render(<App />);
+    renderCamera();
+
     const name = "Iris";
     const input = screen.getByRole("textbox", { name: /nombre/i });
 
@@ -39,7 +40,7 @@ describe("UserCamera", () => {
   it("shows camera when user's name is in local storage", () => {
     const name = "Iris";
     localStorage.setItem("name", name);
-    render(<App />);
+    renderCamera();
 
     const cameraButton = screen.getByRole("button", { name: /capture/i });
 
@@ -51,7 +52,7 @@ describe("UserCamera", () => {
   it("shows discard button when user clicks on camera button", () => {
     const name = "Iris";
     localStorage.setItem("name", name);
-    render(<App />);
+    renderCamera();
 
     const cameraButton = screen.getByRole("button", { name: /capture/i });
     userEvent.click(cameraButton);
@@ -65,7 +66,7 @@ describe("UserCamera", () => {
   it("shows submit button when user clicks on camera button", () => {
     const name = "Iris";
     localStorage.setItem("name", name);
-    render(<App />);
+    renderCamera();
 
     const cameraButton = screen.getByRole("button", { name: /capture/i });
     userEvent.click(cameraButton);
@@ -79,7 +80,7 @@ describe("UserCamera", () => {
   it("shows camera button when user clicks on submit button", () => {
     const name = "Iris";
     localStorage.setItem("name", name);
-    render(<App />);
+    renderCamera();
 
     const cameraButton = screen.getByRole("button", { name: /capture/i });
     userEvent.click(cameraButton);
@@ -93,38 +94,13 @@ describe("UserCamera", () => {
       ).toBeInTheDocument();
     });
   });
-
-  describe("Gallery", () => {
-    it("shows loader when there is not data", () => {
-      const history = createMemoryHistory();
-      const route = "/gallery";
-      history.push(route);
-      render(
-        <Router location={route} navigator={history}>
-          <Routes>
-            <Route path={route} element={Gallery("")} />
-          </Routes>
-        </Router>
-      );
-
-      expect(screen.getByTitle("loader")).toBeInTheDocument();
-    });
-
-    it("shows the image", () => {
-      const history = createMemoryHistory();
-      const route = "/gallery";
-      history.push(route);
-      render(
-        <Router location={route} navigator={history}>
-          <Routes>
-            <Route path={route} element={Gallery("/some-image.jpg")} />
-          </Routes>
-        </Router>
-      );
-
-      expect(
-        screen.getByRole("img", { name: "gallery-image" })
-      ).toBeInTheDocument();
-    });
-  });
 });
+
+const renderCamera = () => {
+  const history = createMemoryHistory();
+  render(
+    <Router location={"/"} navigator={history}>
+      <CameraWrapper />
+    </Router>
+  );
+};
