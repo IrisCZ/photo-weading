@@ -45,6 +45,7 @@
     ]
   },
   "devDependencies": {
-    "jest-watch-typeahead": "^0.6.5"
+    "jest-watch-typeahead": "^0.6.5",
+    "msw": "^0.39.2"
   }
 }
