@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { LocalStorageMock } from "../test-helper/localStorageMock";
 import CameraWrapper from "./CameraWrapper";
@@ -15,6 +15,32 @@ describe("CameraWrapper", () => {
   Object.defineProperty(HTMLMediaElement.prototype, "muted", {
     set: () => {},
   }); // mutes Webcam Warning: unstable_flushDiscreteUpdates: Cannot flush updates when React is already rendering.
+
+  beforeAll(() => {
+    const mockMediaDevices: any = {
+      getUserMedia: (constraints: any) => {
+        return new Promise((resolve, reject) => {
+          resolve({
+            getVideoTracks:(constraints: any) => [{
+              getCapabilities: () => ({
+                height: {
+                  max: 100
+                },
+                width: {
+                  max: 200
+                }
+              })
+            }],
+            stop: () => {}
+          })
+        })
+      }
+    };
+    Object.defineProperty(window.navigator, 'mediaDevices', {
+      writable: true,
+      value: mockMediaDevices,
+    });
+  })
 
   beforeEach(() => {
     localStorage.clear();
@@ -59,6 +85,7 @@ describe("CameraWrapper", () => {
     renderCamera();
 
     const cameraButton = screen.getByRole("button", { name: /capture/i });
+    
     userEvent.click(cameraButton);
 
     const discardButton = screen.getByRole("button", { name: /discard/i });
@@ -81,15 +108,15 @@ describe("CameraWrapper", () => {
     });
   });
 
-  it.only("shows camera button when user clicks on submit button", () => {
+  it.only("shows camera button when user clicks on submit button", async () => {
     const name = "Iris";
     localStorage.setItem("name", name);
     renderCamera();
 
-    const cameraButton = screen.getByRole("button", { name: /capture/i });
+    const cameraButton = await screen.findByRole("button", { name: /capture/i });
     userEvent.click(cameraButton);
 
-    const discardButton = screen.getByRole("button", { name: /discard/i });
+    const discardButton = await screen.findByRole("button", { name: /discard/i });
     userEvent.click(discardButton);
 
     return waitFor(() => {

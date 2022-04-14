@@ -34,7 +34,6 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
   });
 
   const capture = useCallback(() => {
-    // console.log({ cameraSize });
     if (!videoRef.current || !cameraSize) return;
     const imageSrc = videoRef.current.getScreenshot({
       height: cameraSize.height,
@@ -68,16 +67,13 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
     setPhoto(null);
     setCapturing(true);
   };
-
   return (
     <section className="camera">
       <Webcam
         ref={videoRef}
         screenshotFormat="image/jpeg"
         onUserMedia={(stream) => {
-          // console.log("webcam", cameraSize);
           if (!cameraSize) {
-            // console.log("webcam");
             setCameraSize({
               height: stream.getVideoTracks()[0].getCapabilities().height!
                 .max as number,
@@ -108,12 +104,11 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
         ></img>
       )}
       <footer className="camera-buttons">
-        {capturing ? (
-          <>
-            <button aria-label="capture" className="button" onClick={capture}>
+        {capturing ? <>
+            <button hidden={!cameraSize} aria-label="capture" className="button" onClick={capture}>
               <i className="fa-solid fa-camera"></i>
             </button>
-            <button
+            <button hidden={!cameraSize}
               aria-label="rotate"
               className="button"
               onClick={rotateCamara}
@@ -121,7 +116,7 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
               <i className="fa-solid fa-camera-rotate"></i>
             </button>
           </>
-        ) : (
+         : (
           <>
             <button
               aria-label="discard"
