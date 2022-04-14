@@ -6,6 +6,10 @@ import { Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
 
 global.localStorage = new LocalStorageMock();
+// global.window.HTMLMediaElement.prototype._mock = {
+//   width: 100,
+//   height: 100,
+// };
 
 describe("CameraWrapper", () => {
   Object.defineProperty(HTMLMediaElement.prototype, "muted", {
@@ -77,7 +81,7 @@ describe("CameraWrapper", () => {
     });
   });
 
-  it("shows camera button when user clicks on submit button", () => {
+  it.only("shows camera button when user clicks on submit button", () => {
     const name = "Iris";
     localStorage.setItem("name", name);
     renderCamera();

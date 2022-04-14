@@ -1,7 +1,6 @@
 import "../App.css";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
-import { useOrientationEvent } from "../useOrientationEvent";
 
 type CameraProps = {
   onUploadPhoto: (imageSrc: Blob) => void;
@@ -14,23 +13,41 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
   const [facingMode, setFacingMode] = useState<string>("user");
   const [error, setError] = useState<boolean>(false);
   const [capturing, setCapturing] = useState(true);
+  const [cameraSize, setCameraSize] = useState<{
+    width: number;
+    height: number;
+  }>();
   const [size, setSize] = useState({
     width: window.screen.availWidth,
     height: window.screen.availHeight,
   });
 
+  useEffect(() => {
+    const handleChange = () =>
+      setSize({ width: size.height, height: size.width });
+
+    window.screen.orientation?.addEventListener("change", handleChange, false);
+
+    return function cleanup() {
+      window.screen.orientation?.removeEventListener("change", handleChange);
+    };
+  });
+
   const capture = useCallback(() => {
-    if (!videoRef.current) return;
-    const imageSrc = videoRef.current.getScreenshot();
+    // console.log({ cameraSize });
+    if (!videoRef.current || !cameraSize) return;
+    const imageSrc = videoRef.current.getScreenshot({
+      height: cameraSize.height,
+      width: cameraSize.width,
+    });
     setPhoto(imageSrc);
     setCapturing(false);
-  }, [videoRef, setPhoto]);
+  }, [cameraSize]);
 
   const rotateCamara = () => {
     facingMode === "user"
       ? setFacingMode("environment")
       : setFacingMode("user");
-    console.log({ facingMode });
   };
 
   const uploadPhoto = () => {
@@ -38,6 +55,7 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
       const canvas = videoRef.current?.getCanvas();
       new Promise((resolve) => canvas?.toBlob(resolve, "image/jpeg")).then(
         (image) => {
+          // console.log({ image });
           onUploadPhoto(image as Blob);
           setPhoto(null);
           setCapturing(true);
@@ -51,37 +69,45 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
     setCapturing(true);
   };
 
-  useOrientationEvent("change", () => {
-    setSize({
-      width: window.screen.availWidth,
-      height: window.screen.availHeight,
-    });
-  });
-
-  const videoConstraints = {
-    ...size,
-    facingMode,
-  };
-
   return (
     <section className="camera">
       <Webcam
         ref={videoRef}
         screenshotFormat="image/jpeg"
+        onUserMedia={(stream) => {
+          // console.log("webcam", cameraSize);
+          if (!cameraSize) {
+            // console.log("webcam");
+            setCameraSize({
+              height: stream.getVideoTracks()[0].getCapabilities().height!
+                .max as number,
+              width: stream.getVideoTracks()[0].getCapabilities().width!
+                .max as number,
+            });
+          }
+        }}
         onUserMediaError={() => setError(true)}
+        forceScreenshotSourceSize={false}
         onError={() => setError(true)}
         className="video"
         audio={false}
-        videoConstraints={videoConstraints}
+        videoConstraints={{
+          ...cameraSize,
+          facingMode,
+        }}
       />
       {photo && (
         <img
           src={photo || ""}
-          alt="hola"
-          style={{ position: "absolute" }}
+          alt="user"
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+          }}
         ></img>
       )}
-      <div className="camera-buttons">
+      <footer className="camera-buttons">
         {capturing ? (
           <>
             <button aria-label="capture" className="button" onClick={capture}>
@@ -119,7 +145,7 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
             camara, si no sabes hacerlo contacta con {organizer}{" "}
           </p>
         )}
-      </div>
+      </footer>
     </section>
   );
 }
