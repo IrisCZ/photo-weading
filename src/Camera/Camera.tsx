@@ -1,11 +1,30 @@
 import "../App.css";
 import { useCallback, useEffect, useRef, useState } from "react";
-import Webcam from "react-webcam";
+import Webcam from "./Webcam";
 
 type CameraProps = {
   onUploadPhoto: (imageSrc: Blob) => void;
   organizer: string;
 };
+
+enum Orientation {
+  PORTRAIT = 'portrait',
+  LANDSCAPE = 'landscape'
+}
+
+const getOrientation = () => {
+  return window.screen.orientation.type.includes('landscape') ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+}
+
+const calculateCameraSize = () => {
+  return getOrientation() === Orientation.LANDSCAPE ? {
+    width: { min: 1280 }, 
+    height: { min: 720 },
+  } : {
+    width: { min: 720 }, 
+    height: { min: 1280 },
+  }
+}
 
 function Camera({ onUploadPhoto, organizer }: CameraProps) {
   const videoRef = useRef<Webcam & HTMLVideoElement>(null);
@@ -13,19 +32,18 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
   const [facingMode, setFacingMode] = useState<string>("user");
   const [error, setError] = useState<boolean>(false);
   const [capturing, setCapturing] = useState(true);
-  const [cameraSize, setCameraSize] = useState<{
-    width: number;
-    height: number;
-  }>();
-  const [size, setSize] = useState({
-    width: window.screen.availWidth,
-    height: window.screen.availHeight,
-  });
+  const [cameraCapabilities, setCameraCapabilities] = useState<MediaTrackCapabilities>();
+  const [orientation, setOrientation] = useState<Orientation>(getOrientation());
+  const [videoConstraints, setVideoConstraints] = useState({...calculateCameraSize(), facingMode});
 
   useEffect(() => {
     const handleChange = () =>
-      setSize({ width: size.height, height: size.width });
-
+      {
+        discardPhoto();
+        const newOrientation = getOrientation();
+        setOrientation(newOrientation);
+        setVideoConstraints({...calculateCameraSize(), facingMode})
+      }
     window.screen.orientation?.addEventListener("change", handleChange, false);
 
     return function cleanup() {
@@ -34,14 +52,11 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
   });
 
   const capture = useCallback(() => {
-    if (!videoRef.current || !cameraSize) return;
-    const imageSrc = videoRef.current.getScreenshot({
-      height: cameraSize.height,
-      width: cameraSize.width,
-    });
+    if (!videoRef.current || !cameraCapabilities) return;
+    const imageSrc = videoRef.current.getScreenshot();
     setPhoto(imageSrc);
     setCapturing(false);
-  }, [cameraSize]);
+  }, [cameraCapabilities]);
 
   const rotateCamara = () => {
     facingMode === "user"
@@ -49,17 +64,22 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
       : setFacingMode("user");
   };
 
+  useEffect(() => {
+    setVideoConstraints({...calculateCameraSize(), facingMode})
+  }, [facingMode])
+
   const uploadPhoto = () => {
     if (photo) {
       const canvas = videoRef.current?.getCanvas();
-      new Promise((resolve) => canvas?.toBlob(resolve, "image/jpeg")).then(
+      new Promise((resolve) => canvas?.toBlob(resolve)).then(
         (image) => {
-          // console.log({ image });
           onUploadPhoto(image as Blob);
           setPhoto(null);
           setCapturing(true);
         }
-      );
+      ).catch((e) => {
+        console.log("ERROR", e)
+      });
     }
   };
 
@@ -67,48 +87,43 @@ function Camera({ onUploadPhoto, organizer }: CameraProps) {
     setPhoto(null);
     setCapturing(true);
   };
+
+  const videoSize = getOrientation() === Orientation.LANDSCAPE ? 
+  {width: '100%', height: 'auto'} : {height: '100%', width: 'auto'};
+
   return (
-    <section className="camera">
-      <Webcam
+    <section className={`camera ${orientation}`}>
+      {<Webcam
         ref={videoRef}
-        screenshotFormat="image/jpeg"
         onUserMedia={(stream) => {
-          if (!cameraSize) {
-            setCameraSize({
-              height: stream.getVideoTracks()[0].getCapabilities().height!
-                .max as number,
-              width: stream.getVideoTracks()[0].getCapabilities().width!
-                .max as number,
-            });
-          }
+          setCameraCapabilities(stream.getVideoTracks()[0].getCapabilities())
         }}
         onUserMediaError={() => setError(true)}
-        forceScreenshotSourceSize={false}
+        forceScreenshotSourceSize={true}
         onError={() => setError(true)}
         className="video"
         audio={false}
-        videoConstraints={{
-          ...cameraSize,
-          facingMode,
-        }}
-      />
+        mirrored={facingMode === 'user'}
+        style={{...videoSize, maxHeight: '100vh', maxWidth: '100vw', display: capturing ? 'inherit' : 'none'}}
+        videoConstraints={videoConstraints}
+      />}
       {photo && (
         <img
           src={photo || ""}
           alt="user"
           style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
+            width: orientation === Orientation.PORTRAIT ? '100%' : "auto",
+            height: orientation === Orientation.PORTRAIT ? "auto": '100%',
+            position: 'absolute'
           }}
         ></img>
       )}
       <footer className="camera-buttons">
         {capturing ? <>
-            <button hidden={!cameraSize} aria-label="capture" className="button" onClick={capture}>
+            <button hidden={!cameraCapabilities} aria-label="capture" className="button" onClick={capture}>
               <i className="fa-solid fa-camera"></i>
             </button>
-            <button hidden={!cameraSize}
+            <button hidden={!cameraCapabilities}
               aria-label="rotate"
               className="button"
               onClick={rotateCamara}
