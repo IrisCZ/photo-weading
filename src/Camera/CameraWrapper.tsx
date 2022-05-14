@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useLocalStorage } from "../useLocalStorage";
 import Camera from "./Camera";
 import Welcome from "./Welcome";
@@ -5,7 +6,7 @@ import Welcome from "./Welcome";
 function CameraWrapper() {
   const organizer = "Sara y Celes";
   const [name, setName] = useLocalStorage("name", "");
-  const [, setEmail] = useLocalStorage("email", "");
+  const [email, setEmail] = useLocalStorage("email", "");
 
   const handleSubmit = ({
     name: newName,
@@ -18,8 +19,10 @@ function CameraWrapper() {
     setEmail(newEmail);
   };
 
+  const newPhotoLinkUrl = useMemo(() => encodeURI(`/new-photo-link?name=${name}&email=${email}`), [email, name])
+
   const handleUploadPhoto = (photoSrc: Blob) => {
-    fetch(`/new-photo-link?name=${name}`).then(async (result) => {
+    fetch(newPhotoLinkUrl).then(async (result) => {
       if (result.ok) {
         const { link: url } = await result.json();
         fetch(url, {
@@ -29,13 +32,10 @@ function CameraWrapper() {
           }),
           body: photoSrc,
         })
-          .then((response) => {
-            if (response.status === 200) {
-              console.log("ENVIADO!!!");
-            }
-          })
-          .catch(() => {
-            alert("ERROR");
+          
+          .catch((e) => {
+            alert("No se ha podido enviar la foto");
+            console.error("Error:", e);
           });
       }
     });

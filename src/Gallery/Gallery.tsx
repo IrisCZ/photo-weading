@@ -11,21 +11,22 @@ function Gallery({ timelapse }: GalleryProps) {
   const [photoGallery, setPhotoGallery] = useState({
     data: "",
     error: false,
-    key: "",
+    key,
   });
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const url = `/next-photo?lastPhoto=${key || ""}`;
+      const url = `/next-photo?lastPhoto=${photoGallery.key || ""}`;
       fetch(url)
         .then((result) => result.json())
-        .then((newData: { link: string; key: string }) => {
+        .then(({link, key}: { link: string; key: string }) => {
+          console.log({link, key})
           setPhotoGallery({
-            data: newData.link,
+            data: link,
             error: false,
-            key: newData.key,
+            key: key,
           });
-          setKey(newData.key);
+          setKey(key);
         })
         .catch(function (error) {
           console.log(error);
