@@ -51,12 +51,10 @@ function CameraWrapper() {
             "Content-Type": "video/webm",
           }),
           body: videoSrc,
-        })
-          
-          .catch((e) => {
-            alert("No se ha podido enviar el video");
-            console.error("Error:", e);
-          });
+        }).catch((e) => {
+          alert("No se ha podido enviar el video");
+          console.error("Error:", e);
+        });
       }
     });
   };

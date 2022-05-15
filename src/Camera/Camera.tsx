@@ -29,64 +29,57 @@ const calculateCameraSize = () => {
 
 function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
   const videoRef = useRef<Webcam & HTMLVideoElement>(null);
-  const mediaRecorder = useRef<MediaRecorder>();
-  const [recording, setRecording] = useState(false);
+  const videoUploadRef = useRef<HTMLInputElement>(null);
+  const [video, setVideo] = useState<string | null>(null);
+  // const mediaRecorder = useRef<MediaRecorder>();
+  // const [recording, setRecording] = useState(false);
   const [recordedChunks, setRecordedChunks] = useState([]);
   const [photo, setPhoto] = useState<string | null>(null);
   // const [video, setVideo] = useState<string | null>(null);
-  const [facingMode, setFacingMode] = useState<string>("user");
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>("user");
   const [error, setError] = useState<boolean>(false);
   const [capturing, setCapturing] = useState(true);
   const [orientation, setOrientation] = useState<Orientation>(getOrientation());
   const [videoConstraints, setVideoConstraints] = useState({...calculateCameraSize(), facingMode});
 
-  const handleDataAvailable = useCallback(
-    ({ data }) => {
-      if (data.size > 0) {
-        setRecordedChunks((prev) => prev.concat(data));
-      }
-    },
-    [setRecordedChunks]
-  );
-
-  const handleStartRecording = useCallback(() => {
-    if (!videoRef.current?.stream) { return }
-    setRecording(true);
-    mediaRecorder.current = new MediaRecorder(videoRef.current.stream, {
-      mimeType: "video/webm"
+  useEffect(() => {
+    videoUploadRef.current?.addEventListener('change', (e) => {
+      const target = e.target as HTMLInputElement;      
+      const file = target?.files?.[0];
+      onUploadVideo(file as Blob);
+      // if (videoRef.current){
+      //   const url = URL.createObjectURL(file as Blob)
+      //   console.log("AAAA", url)
+      //   //videoRef.current.src = URL.createObjectURL(file);
+      //   setVideo(url)
+      //   setCapturing(false);
+      // }
     });
-    mediaRecorder.current.addEventListener("dataavailable", handleDataAvailable);
-    mediaRecorder.current.start();
-  }, [handleDataAvailable]);
+  }, [onUploadVideo])
+  // const handleDataAvailable = useCallback(
+  //   ({ data }) => {
+  //     if (data.size > 0) {
+  //       setRecordedChunks((prev) => prev.concat(data));
+  //     }
+  //   },
+  //   [setRecordedChunks]
+  // );
 
-  const handleStopRecording = useCallback(() => {
-    mediaRecorder.current?.stop();
-    setRecording(false);
-    setCapturing(false);
-    // const blob = new Blob(recordedChunks, {
-    //   type: "video/webm"
-    // });
-    // const url = URL.createObjectURL(blob);
-    // setVideo(url)
-  }, [recordedChunks]);
+  // const handleStartRecording = useCallback(() => {
+  //   if (!videoRef.current?.stream) { return }
+  //   setRecording(true);
+  //   mediaRecorder.current = new MediaRecorder(videoRef.current.stream, {
+  //     mimeType: "video/webm"
+  //   });
+  //   mediaRecorder.current.addEventListener("dataavailable", handleDataAvailable);
+  //   mediaRecorder.current.start();
+  // }, [handleDataAvailable]);
 
-  // const handleDownload = useCallback(() => {
-  //   if (recordedChunks.length) {
-  //     const blob = new Blob(recordedChunks, {
-  //       type: "video/webm"
-  //     });
-  //     const url = URL.createObjectURL(blob);
-  //     const a = document.createElement("a");
-  //     document.body.appendChild(a);
-  //     //@ts-ignore
-  //     a.style = "display: none";
-  //     a.href = url;
-  //     a.download = "react-webcam-stream-capture.webm";
-  //     a.click();
-  //     window.URL.revokeObjectURL(url);
-  //     setRecordedChunks([]);
-  //   }
-  // }, [recordedChunks]);
+  // const handleStopRecording = useCallback(() => {
+  //   mediaRecorder.current?.stop();
+  //   setRecording(false);
+  //   setCapturing(false);
+  // }, []);
 
   useEffect(() => {
     const handleChange = () =>
@@ -146,22 +139,17 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
 
   const discardPhoto = () => {
     setPhoto(null);
+    setVideo(null);
     setCapturing(true);
   };
 
   const buttons = useMemo(() => {
-    if (recording){
-      return <button aria-label="recording" className="button" onClick={handleStopRecording}>
-        <i className="fa-solid fa-stop"></i>
-      </button>
-    }
-
     if (capturing){
       return <>
         <button aria-label="capture" className="button" onClick={capture}>
           <i className="fa-solid fa-camera"></i>
         </button>
-        <button aria-label="capture" className="button" onClick={handleStartRecording}>
+        <button aria-label="capture" className="button" onClick={() => videoUploadRef.current?.click()}>
           <i className="fa-solid fa-video"></i>
         </button>
         <button aria-label="rotate" className="button" onClick={rotateCamera}
@@ -180,7 +168,7 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
       </button>
     </>
 
-  }, [capture, capturing, handleStartRecording, handleStopRecording, recording, rotateCamera, uploadFile])
+  }, [capture, capturing, rotateCamera, uploadFile])
 
   const videoSize = getOrientation() === Orientation.LANDSCAPE ? 
   {width: '100%', height: 'auto'} : {height: '100%', width: 'auto'};
@@ -193,11 +181,13 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
         forceScreenshotSourceSize={true}
         onError={() => setError(true)}
         className="video"
-        audio={true}
+        //audio={true}
+        audio={false}
         mirrored={facingMode === 'user'}
         style={{...videoSize, maxHeight: '100vh', maxWidth: '100vw', display: capturing ? 'inherit' : 'none'}}
         videoConstraints={videoConstraints}
       />}
+      <input type="file" accept="video/*" capture={facingMode} style={{display: 'none'}} ref={videoUploadRef}/>
       {photo && (
         <img
           src={photo}
@@ -209,9 +199,9 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
           }}
         ></img>
       )}
-      {/* {video && (
-        <video src={video}></video>
-      )} */}
+      {video && (
+        <video src={video} autoPlay width={"100%"} controls></video>
+      )}
       <footer className="camera-buttons">
         {buttons}
         {error && (
