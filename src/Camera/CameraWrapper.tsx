@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback } from "react";
 import { useLocalStorage } from "../useLocalStorage";
 import Camera from "./Camera";
 import Welcome from "./Welcome";
@@ -19,10 +19,10 @@ function CameraWrapper() {
     setEmail(newEmail);
   };
 
-  const newPhotoLinkUrl = useMemo(() => encodeURI(`/new-photo-link?name=${name}&email=${email}`), [email, name])
+  const newLinkUrl = useCallback((isVideo = false) => encodeURI(`/new-photo-link?name=${name}&email=${email}&isVideo=${isVideo}`), [email, name])
 
   const handleUploadPhoto = (photoSrc: Blob) => {
-    fetch(newPhotoLinkUrl).then(async (result) => {
+    fetch(newLinkUrl()).then(async (result) => {
       if (result.ok) {
         const { link: url } = await result.json();
         fetch(url, {
@@ -41,9 +41,30 @@ function CameraWrapper() {
     });
   };
 
+  const handleUploadVideo = (videoSrc: Blob) => {
+    fetch(newLinkUrl(true)).then(async (result) => {
+      if (result.ok) {
+        const { link: url } = await result.json();
+        fetch(url, {
+          method: "PUT",
+          headers: new Headers({
+            "Content-Type": "video/webm",
+          }),
+          body: videoSrc,
+        })
+          
+          .catch((e) => {
+            alert("No se ha podido enviar el video");
+            console.error("Error:", e);
+          });
+      }
+    });
+  };
+
   return name ? (
     <Camera
       onUploadPhoto={handleUploadPhoto}
+      onUploadVideo={handleUploadVideo}
       organizer={organizer ? organizer : "el organizador de la boda"}
     />
   ) : (

@@ -20,7 +20,6 @@ function Gallery({ timelapse }: GalleryProps) {
       fetch(url)
         .then((result) => result.json())
         .then(({link, key}: { link: string; key: string }) => {
-          console.log({link, key})
           setPhotoGallery({
             data: link,
             error: false,
