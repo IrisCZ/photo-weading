@@ -20,6 +20,7 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
     if (pictureContent){
       setUploading(true);
       await onUploadPhoto(pictureContent);
+      URL.revokeObjectURL(picture!);
       setUploading(false);
       setPicture('');
       setPictureContent(null);
@@ -28,6 +29,7 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
       setUploading(true);
       await onUploadVideo(videoContent);
       setUploading(false);
+      URL.revokeObjectURL(video!);
       setVideo('');
       setVideoContent(null);
     }
