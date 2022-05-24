@@ -22,10 +22,10 @@ function CameraWrapper() {
   const newLinkUrl = useCallback((isVideo = false) => encodeURI(`/new-photo-link?name=${name}&email=${email}&isVideo=${isVideo}`), [email, name])
 
   const handleUploadPhoto = (photoSrc: Blob) => {
-    fetch(newLinkUrl()).then(async (result) => {
+    return fetch(newLinkUrl()).then(async (result) => {
       if (result.ok) {
         const { link: url } = await result.json();
-        fetch(url, {
+        await fetch(url, {
           method: "PUT",
           headers: new Headers({
             "Content-Type": "image/jpeg",
@@ -42,10 +42,10 @@ function CameraWrapper() {
   };
 
   const handleUploadVideo = (videoSrc: Blob) => {
-    fetch(newLinkUrl(true)).then(async (result) => {
+    return fetch(newLinkUrl(true)).then(async (result) => {
       if (result.ok) {
         const { link: url } = await result.json();
-        fetch(url, {
+        await fetch(url, {
           method: "PUT",
           headers: new Headers({
             "Content-Type": "video/webm",
