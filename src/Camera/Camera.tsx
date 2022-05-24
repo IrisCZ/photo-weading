@@ -20,8 +20,8 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
     if (pictureContent){
       setUploading(true);
       await onUploadPhoto(pictureContent);
-      URL.revokeObjectURL(picture!);
       setUploading(false);
+      URL.revokeObjectURL(picture!);
       setPicture('');
       setPictureContent(null);
     }
