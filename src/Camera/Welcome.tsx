@@ -13,10 +13,11 @@ function Welcome({ onSubmitInfo, organizer }: WelcomeProps) {
   return (
     <div className="welcome">
       <header>
-        <p>Bienvenidos a la boda de </p>
+        <p>¡Hola! Somos </p>
         <h1>{organizer}</h1>
       </header>
       <section className="form-container">
+        <h2>¡Bienvenidos a nuestra boda!</h2>
         <div className="form-field">
           <label htmlFor="name">
             Dinos tu nombre para que sepamos de quién son las fotos.
@@ -30,19 +31,6 @@ function Welcome({ onSubmitInfo, organizer }: WelcomeProps) {
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-        <div className="form-field">
-          <label htmlFor="email">
-            Dinos tu email para que podamos mandarte las fotos dentro de unos
-            días. <br /> ¡No seais impacientes!
-          </label>
-          <input
-            type="text"
-            className="form-input"
-            value={email}
-            id="email"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
         <button
           className="button"
           onClick={(e) => {
@@ -51,7 +39,7 @@ function Welcome({ onSubmitInfo, organizer }: WelcomeProps) {
           }}
           aria-label="submit"
         >
-          <i className="fa-solid fa-paper-plane"></i>
+          Enviar
         </button>
       </section>
     </div>

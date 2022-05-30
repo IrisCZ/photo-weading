@@ -1,14 +1,42 @@
+* {
+  box-sizing: border-box;
+}
+
 .App {
   background-color: #282c34;
+  background-image: url(./images/boda2.jpeg);
+  background-position: center;
+  background-size: cover;
   color: white;
   text-align: center;
 }
 
 footer {
-  bottom: 2rem;
+  bottom: 0;
+  width: 100%;
+}
+
+.button {
+  background-color: rgba(241, 78, 149, 0.8);
+  border-color: transparent;
+  border-radius: 0.5rem;
+  color: #fff;
+  font-family: "Sacramento", Arial, serif;
+  font-weight: 900;
+  font-size: 2rem;
+  line-height: 4.4rem;
+  margin: 1rem;
+  height: 4rem;
+  width: -webkit-fill-available;
 }
 
 /* ## Camera Section */
+
+.text-container {
+  padding: 1.4rem 1rem;
+  background-color: #ffffffd6;
+  color: #2c2d30;
+}
 
 .camera-buttons {
   position: absolute;
@@ -18,7 +46,7 @@ footer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   height: 100vh;
 }
 
@@ -26,11 +54,7 @@ footer {
   flex-direction: row;
 }
 
-/* .video { */
-  /* position: absolute; */
-  /* height: 100vh; */
-  /* width: 100vw; */
-/* } */
+/* ## Welcome Section */
 
 .welcome {
   display: flex;
@@ -43,9 +67,14 @@ footer {
   background-size: cover;
 }
 
+.welcome h2 {
+  color: rgba(241, 78, 149, 0.8);
+  line-height: 4rem;
+}
+
 .form-container {
   margin: 3rem 0;
-  padding: 2rem 1rem;
+  padding: 1.4rem 1rem;
   background-color: #ffffffd6;
   color: #2c2d30;
 }
@@ -58,31 +87,16 @@ footer {
   border: 1px solid rgba(241, 78, 149, 0.8);
   background-color: transparent;
   height: 2rem;
-  width: 100%;
+  width: -webkit-fill-available;
 }
 
 .form-input:focus-visible {
   outline: 1px solid rgba(241, 78, 149, 0.8);
 }
 
-.button {
-  background-color: rgba(241, 78, 149, 0.8);
-  border-color: transparent;
-  border-radius: 50%;
-  color: #fff;
-  font-family: "Sacramento", Arial, serif;
-  font-weight: 900;
-  font-size: 2rem;
-  line-height: 4.4rem;
-  margin: 1rem;
-  height: 4rem;
-  width: 4rem;
-}
-
 /* ## Gallery Section */
 
 .gallery {
-  /* background-image: url(./images/saveTheDate.jpeg); */
   display: flex;
   justify-content: center;
   align-content: center;

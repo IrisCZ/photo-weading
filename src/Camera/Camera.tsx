@@ -11,97 +11,140 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
   const videoUploadRef = useRef<HTMLInputElement>(null);
   const pictureUploadRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [picture, setPicture] = useState<string>(); 
+  const [picture, setPicture] = useState<string>();
   const [pictureContent, setPictureContent] = useState<Blob | null>();
   const [videoContent, setVideoContent] = useState<Blob | null>();
-  const [video, setVideo] = useState<string>(); 
+  const [video, setVideo] = useState<string>();
 
   const upload = useCallback(async () => {
-    if (pictureContent){
+    if (pictureContent) {
       setUploading(true);
       await onUploadPhoto(pictureContent);
       setUploading(false);
       URL.revokeObjectURL(picture!);
-      setPicture('');
+      setPicture("");
       setPictureContent(null);
     }
-    if (videoContent){
+    if (videoContent) {
       setUploading(true);
       await onUploadVideo(videoContent);
       setUploading(false);
       URL.revokeObjectURL(video!);
-      setVideo('');
+      setVideo("");
       setVideoContent(null);
     }
-  },[onUploadPhoto, onUploadVideo, pictureContent, videoContent]);
+  }, [
+    onUploadPhoto,
+    onUploadVideo,
+    picture,
+    pictureContent,
+    video,
+    videoContent,
+  ]);
 
   useEffect(() => {
-    videoUploadRef.current?.addEventListener('change', (e) => {
-      const target = e.target as HTMLInputElement;      
+    videoUploadRef.current?.addEventListener("change", (e) => {
+      const target = e.target as HTMLInputElement;
       const file = target?.files?.[0] as Blob;
-      setVideoContent(file)
+      setVideoContent(file);
       setVideo(URL.createObjectURL(file));
     });
-    pictureUploadRef.current?.addEventListener('change', (e) => {
-      const target = e.target as HTMLInputElement;      
+    pictureUploadRef.current?.addEventListener("change", (e) => {
+      const target = e.target as HTMLInputElement;
       const file = target?.files?.[0] as Blob;
-      setPictureContent(file)
-      setPicture(URL.createObjectURL(file))
+      setPictureContent(file);
+      setPicture(URL.createObjectURL(file));
     });
-  }, [onUploadPhoto, onUploadVideo])
+  }, [onUploadPhoto, onUploadVideo]);
 
   const discard = () => {
-    setPicture('');
-    setPictureContent(null)
-    setVideo('');
+    setPicture("");
+    setPictureContent(null);
+    setVideo("");
     setVideoContent(null);
   };
 
   const buttons = useMemo(() => {
-    if (uploading){
-      return <>Subiendo.....</>
+    if (uploading) {
+      return <>Subiendo.....</>;
     }
-    if (picture || video){
-      return <>
-           <button aria-label="discard" className="button" onClick={discard}>
-             <i className="fa-solid fa-xmark"></i>
-           </button>
-           <button aria-label="submit" className="button" onClick={upload}>
-             <i className="fa-solid fa-paper-plane"></i>
-           </button>
-         </>
+    if (picture || video) {
+      return (
+        <>
+          <button aria-label="discard" className="button" onClick={discard}>
+            <i className="fa-solid fa-xmark"></i>
+          </button>
+          <button aria-label="submit" className="button" onClick={upload}>
+            <i className="fa-solid fa-paper-plane"></i>
+          </button>
+        </>
+      );
     }
-      return <>
-        <button aria-label="capture" className="button" onClick={() => pictureUploadRef.current?.click()}>
-          <i className="fa-solid fa-camera"></i>
-        </button>
-        <button aria-label="capture" className="button" onClick={() => videoUploadRef.current?.click()}>
+    return (
+      <>
+        <button
+          aria-label="capture"
+          className="button"
+          onClick={() => videoUploadRef.current?.click()}
+        >
           <i className="fa-solid fa-video"></i>
         </button>
+        <button
+          aria-label="capture"
+          className="button"
+          onClick={() => pictureUploadRef.current?.click()}
+        >
+          <i className="fa-solid fa-camera"></i>
+        </button>
       </>
-
-  }, [picture, upload, uploading, video])
+    );
+  }, [picture, upload, uploading, video]);
 
   return (
     <section className={`camera`}>
-      <input type="file" accept="video/*" capture={'environment'} style={{display: 'none'}} ref={videoUploadRef}/>
-      <input type="file" accept="image/*" capture={'environment'} style={{display: 'none'}} ref={pictureUploadRef}/>
+      <input
+        type="file"
+        accept="video/*"
+        capture={"environment"}
+        style={{ display: "none" }}
+        ref={videoUploadRef}
+      />
+      <input
+        type="file"
+        accept="image/*"
+        capture={"environment"}
+        style={{ display: "none" }}
+        ref={pictureUploadRef}
+      />
+      {(!picture || !video) && (
+        <section className="text-container">
+          <p>
+            Nos gustaría que nos mandarais un video con vuestros mejores deseos
+            para recordar este momento tan especial para nosotros.
+          </p>
+          <p>
+            Si ya lo habeis hecho... ¡Haz fotos para que podamos verlas en la
+            pantalla!
+          </p>
+        </section>
+      )}
       {picture && (
         <img
           src={picture}
           alt="user"
           style={{
-            width: '100%',
+            width: "100%",
             height: "auto",
-            position: 'absolute'
+            position: "absolute",
           }}
         ></img>
       )}
-      {video && (
-        <video src={video} autoPlay width={"100%"} controls></video>
-      )}
+      {video && <video src={video} autoPlay width={"100%"} controls></video>}
       <footer className="camera-buttons">
         {buttons}
+        <div className="text-container">
+          <p>¡Muchas gracias a todos por venir! 💗</p>
+        </div>
       </footer>
     </section>
   );
