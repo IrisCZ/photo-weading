@@ -1,25 +1,23 @@
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocalStorage } from "../useLocalStorage";
 import Camera from "./Camera";
 import Welcome from "./Welcome";
 
 function CameraWrapper() {
-  const organizer = "Sara y Celes";
   const [name, setName] = useLocalStorage("name", "");
-  const [email, setEmail] = useLocalStorage("email", "");
+  const {t} = useTranslation();
+  const organizer = t('saraandceles');
 
   const handleSubmit = ({
     name: newName,
-    email: newEmail,
   }: {
     name: string;
-    email: string;
   }) => {
     setName(newName);
-    setEmail(newEmail);
   };
 
-  const newLinkUrl = useCallback((isVideo = false) => encodeURI(`/new-photo-link?name=${name}&email=${email}&isVideo=${isVideo}`), [email, name])
+  const newLinkUrl = useCallback((isVideo = false) => encodeURI(`/new-photo-link?name=${name}&isVideo=${isVideo}`), [name])
 
   const handleUploadPhoto = (photoSrc: Blob) => {
     return fetch(newLinkUrl()).then(async (result) => {
@@ -34,7 +32,7 @@ function CameraWrapper() {
         })
           
           .catch((e) => {
-            alert("No se ha podido enviar la foto");
+            alert(t('errorSendingPhoto'));
             console.error("Error:", e);
           });
       }
@@ -52,7 +50,7 @@ function CameraWrapper() {
           }),
           body: videoSrc,
         }).catch((e) => {
-          alert("No se ha podido enviar el video");
+          alert(t('errorSendingVideo'));
           console.error("Error:", e);
         });
       }
@@ -63,7 +61,7 @@ function CameraWrapper() {
     <Camera
       onUploadPhoto={handleUploadPhoto}
       onUploadVideo={handleUploadVideo}
-      organizer={organizer ? organizer : "el organizador de la boda"}
+      organizer={organizer ? organizer : t('theWeddingOrganizer')}
     />
   ) : (
     <Welcome onSubmitInfo={handleSubmit} organizer={organizer} />

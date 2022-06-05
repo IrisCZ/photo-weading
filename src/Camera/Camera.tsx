@@ -1,5 +1,6 @@
 import "../App.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type CameraProps = {
   onUploadPhoto: (imageSrc: Blob) => Promise<void>;
@@ -15,6 +16,7 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
   const [pictureContent, setPictureContent] = useState<Blob | null>();
   const [videoContent, setVideoContent] = useState<Blob | null>();
   const [video, setVideo] = useState<string>();
+  const {t} = useTranslation();
 
   const upload = useCallback(async () => {
     if (pictureContent) {
@@ -66,7 +68,7 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
 
   const buttons = useMemo(() => {
     if (uploading) {
-      return <>Subiendo.....</>;
+      return <>{t('uploading')}</>;
     }
     if (picture || video) {
       return (
@@ -98,7 +100,7 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
         </button>
       </>
     );
-  }, [picture, upload, uploading, video]);
+  }, [picture, t, upload, uploading, video]);
 
   return (
     <section className={`camera`}>
@@ -118,14 +120,8 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
       />
       {(!picture || !video) && (
         <section className="text-container">
-          <p>
-            Nos gustaría que nos mandarais un video con vuestros mejores deseos
-            para recordar este momento tan especial para nosotros.
-          </p>
-          <p>
-            Si ya lo habeis hecho... ¡Haz fotos para que podamos verlas en la
-            pantalla!
-          </p>
+          <p>{t('info1')}</p>
+          <p>{t('info2')}</p>
         </section>
       )}
       {picture && (
@@ -143,7 +139,7 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
       <footer className="camera-buttons">
         {buttons}
         <div className="text-container">
-          <p>¡Muchas gracias a todos por venir! 💗</p>
+          <p>{t('thanksForComing')} 💗</p>
         </div>
       </footer>
     </section>

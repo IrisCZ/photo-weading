@@ -1,26 +1,27 @@
 import "../App.css";
 import { useState } from "react";
+import {useTranslation} from 'react-i18next';
 
 type WelcomeProps = {
-  onSubmitInfo: ({ name, email }: { name: string; email: string }) => void;
+  onSubmitInfo: ({ name }: { name: string }) => void;
   organizer: string;
 };
 
 function Welcome({ onSubmitInfo, organizer }: WelcomeProps) {
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const {t} = useTranslation();
 
   return (
     <div className="welcome">
       <header>
-        <p>¡Hola! Somos </p>
+        <p>{t('hi')}</p>
         <h1>{organizer}</h1>
       </header>
       <section className="form-container">
-        <h2>¡Bienvenidos a nuestra boda!</h2>
+        <h2>{t('welcome')}</h2>
         <div className="form-field">
           <label htmlFor="name">
-            Dinos tu nombre para que sepamos de quién son las fotos.
+            {t('tellUsYourName')}
           </label>
           <input
             type="text"
@@ -35,11 +36,11 @@ function Welcome({ onSubmitInfo, organizer }: WelcomeProps) {
           className="button"
           onClick={(e) => {
             e.stopPropagation();
-            onSubmitInfo({ name, email });
+            onSubmitInfo({ name });
           }}
           aria-label="submit"
         >
-          Enviar
+          {t('send')}
         </button>
       </section>
     </div>
