@@ -45,8 +45,8 @@ i18n
           errorSendingVideo: "O vídeo não pôde ser enviado",
           errorSendingPhoto: "A foto não pôde ser enviada",
           uploading: 'Enviando foto.....',
-          info1: "Gostaríamos que nos enviasse um vídeo com os seus melhores votos para recordar este momento especial para nós.",
-          info2: "Se você já fez isso... Tire fotos para que possamos vê-las na tela!",
+          info1: "Gostava que nos enviasse um vídeo com os seus melhores votos para recordar este momento especial para nós.",
+          info2: "Se tu já fez isso... Tire fotos para que possamos vê-las na tela!",
           thanksForComing: "Muito obrigado a todos por terem vindo!"
         }
       }
