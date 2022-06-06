@@ -12,7 +12,6 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
   const videoUploadRef = useRef<HTMLInputElement>(null);
   const pictureUploadRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [uploaded, setUploaded] = useState(false);
   const [picture, setPicture] = useState<string>();
   const [pictureContent, setPictureContent] = useState<Blob | null>();
   const [videoContent, setVideoContent] = useState<Blob | null>();
@@ -22,35 +21,28 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
   const upload = useCallback(async () => {
     if (pictureContent) {
       setUploading(true);
-      const error = await onUploadPhoto(pictureContent);
+      onUploadPhoto(pictureContent).then((error: string) => {
+        if(error){
+          alert(`${t('errorSendingPhoto')}: ${error}`)
+        }
+      });
       setUploading(false);
       URL.revokeObjectURL(picture!);
       setPicture("");
       setPictureContent(null);
-      if (!error){
-        setUploaded(true);
-        setTimeout(() => {
-          setUploaded(false);
-        }, 5000)
-      } else {
-        alert(`${t('errorSendingPhoto')}: ${error}`)
-      }
     }
     if (videoContent) {
       setUploading(true);
-      const error = await onUploadVideo(videoContent);
+      onUploadVideo(videoContent).then((error: string) => {
+        if(error){
+          alert(`${t('errorSendingVideo')}: ${error}`)
+        }
+      });
       setUploading(false);
       URL.revokeObjectURL(video!);
       setVideo("");
       setVideoContent(null);
-      if (!error){
-        setUploaded(true);
-        setTimeout(() => {
-          setUploaded(false);
-        }, 5000)
-      } else {
-        alert(`${t('errorSendingVideo')}: ${error}`)
-      }
+      
     }
   }, [onUploadPhoto, onUploadVideo, picture, pictureContent, t, video, videoContent]);
 
@@ -146,9 +138,8 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
       <footer className="camera-buttons">
         {buttons}
         <div className="text-container">
-          { uploaded ? <>{t('uploaded')}</> : null }
           { uploading ? <>{t('uploading')}</> : null }
-          {!video && !picture && !uploading && !uploaded ? <p>{t('thanksForComing')} 💗</p> : null }
+          {!video && !picture && !uploading ? <p>{t('thanksForComing')} 💗</p> : null }
         </div> 
       </footer>
     </section>
