@@ -17,7 +17,7 @@ function CameraWrapper() {
     setName(newName);
   };
 
-  const newLinkUrl = useCallback((isVideo = false) => encodeURI(`/new-photo-link?name=${name}&isVideo=${isVideo}`), [name])
+  const newLinkUrl = useCallback((isVideo = false) => encodeURI(`/newww-photo-link?name=${name}&isVideo=${isVideo}`), [name])
 
   const handleUploadPhoto = async (photoSrc: Blob): Promise<string> => {
     return fetch(newLinkUrl()).then(async (result) => {
@@ -37,12 +37,12 @@ function CameraWrapper() {
         }
         return "";
       }).catch((e: Error) => {
-        alert(t('errorSendingPhoto'));
+        alert(`${t('errorSendingPhoto')}: ${e.message}`);
         console.error("Error:", e);
         return e.message;
       });
     }).catch((e: Error) => {
-      alert(t('errorSendingPhoto'));
+      alert(`${t('errorSendingPhoto')}: ${e.message}`);
       console.error("Error:", e);
       return e.message
     });
@@ -66,12 +66,12 @@ function CameraWrapper() {
         }
         return "";
       }).catch((e: Error) => {
-        alert(t('errorSendingVideo'));
+        alert(`${t('errorSendingVideo')}: ${e.message}`);
         console.error("Error:", e);
         return e.message;
       });
     }).catch((e:Error) => {
-      alert(t('errorSendingVideo'));
+      alert(`${t('errorSendingVideo')}: ${e.message}`);
       return e.message
     });;
   };

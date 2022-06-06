@@ -33,7 +33,7 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
           setUploaded(false);
         }, 5000)
       } else {
-        alert(t('errorSendingPhoto'))
+        alert(`${t('errorSendingPhoto')}: ${error}`)
       }
     }
     if (videoContent) {
@@ -49,7 +49,7 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
           setUploaded(false);
         }, 5000)
       } else {
-        alert(t('errorSendingVideo'));
+        alert(`${t('errorSendingVideo')}: ${error}`)
       }
     }
   }, [onUploadPhoto, onUploadVideo, picture, pictureContent, t, video, videoContent]);
