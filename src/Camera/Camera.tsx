@@ -3,8 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 type CameraProps = {
-  onUploadPhoto: (imageSrc: Blob) => Promise<void>;
-  onUploadVideo: (videoSrc: Blob) => Promise<void>;
+  onUploadPhoto: (imageSrc: Blob) => Promise<string>;
+  onUploadVideo: (videoSrc: Blob) => Promise<string>;
   organizer: string;
 };
 
@@ -12,6 +12,7 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
   const videoUploadRef = useRef<HTMLInputElement>(null);
   const pictureUploadRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
   const [picture, setPicture] = useState<string>();
   const [pictureContent, setPictureContent] = useState<Blob | null>();
   const [videoContent, setVideoContent] = useState<Blob | null>();
@@ -21,28 +22,37 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
   const upload = useCallback(async () => {
     if (pictureContent) {
       setUploading(true);
-      await onUploadPhoto(pictureContent);
+      const error = await onUploadPhoto(pictureContent);
       setUploading(false);
       URL.revokeObjectURL(picture!);
       setPicture("");
       setPictureContent(null);
+      if (!error){
+        setUploaded(true);
+        setTimeout(() => {
+          setUploaded(false);
+        }, 5000)
+      } else {
+        alert(t('errorSendingPhoto'))
+      }
     }
     if (videoContent) {
       setUploading(true);
-      await onUploadVideo(videoContent);
+      const error = await onUploadVideo(videoContent);
       setUploading(false);
       URL.revokeObjectURL(video!);
       setVideo("");
       setVideoContent(null);
+      if (!error){
+        setUploaded(true);
+        setTimeout(() => {
+          setUploaded(false);
+        }, 5000)
+      } else {
+        alert(t('errorSendingVideo'));
+      }
     }
-  }, [
-    onUploadPhoto,
-    onUploadVideo,
-    picture,
-    pictureContent,
-    video,
-    videoContent,
-  ]);
+  }, [onUploadPhoto, onUploadVideo, picture, pictureContent, t, video, videoContent]);
 
   useEffect(() => {
     videoUploadRef.current?.addEventListener("change", (e) => {
@@ -67,9 +77,6 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
   };
 
   const buttons = useMemo(() => {
-    if (uploading) {
-      return <>{t('uploading')}</>;
-    }
     if (picture || video) {
       return (
         <>
@@ -118,7 +125,7 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
         style={{ display: "none" }}
         ref={pictureUploadRef}
       />
-      {(!picture || !video) && (
+      {(!picture && !video) && (
         <section className="text-container">
           <p>{t('info1')}</p>
           <p>{t('info2')}</p>
@@ -139,8 +146,10 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
       <footer className="camera-buttons">
         {buttons}
         <div className="text-container">
-          <p>{t('thanksForComing')} 💗</p>
-        </div>
+          { uploaded ? <>{t('uploaded')}</> : null }
+          { uploading ? <>{t('uploading')}</> : null }
+          {!video && !picture && !uploading && !uploaded ? <p>{t('thanksForComing')} 💗</p> : null }
+        </div> 
       </footer>
     </section>
   );

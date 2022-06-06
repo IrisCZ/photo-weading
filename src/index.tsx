@@ -10,13 +10,9 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import i18next from "i18next";
 
 i18next.use(LanguageDetector).init({detection: {order: ['navigator']}});
-console.log(LanguageDetector);
 i18n
-  .use(initReactI18next) // passes i18n down to react-i18next
+  .use(initReactI18next)
   .init({
-    // the translations
-    // (tip move them in a JSON file and import them,
-    // or even better, manage them via a UI: https://react.i18next.com/guides/multiple-translation-files#manage-your-translations-with-a-management-gui)
     resources: {
       es: {
         translation: {
@@ -28,7 +24,8 @@ i18n
           theWeddingOrganizer: "el organizador de la boda",
           errorSendingVideo: "No se ha podido enviar el video",
           errorSendingPhoto: "No se ha podido enviar la foto",
-          uploading: 'Enviando foto.....',
+          uploading: 'Enviando.....',
+          uploaded: 'Recibido, ¡gracias!',
           info1: "Nos gustaría que nos mandarais un video con vuestros mejores deseos para recordar este momento tan especial para nosotros.",
           info2: "Si ya lo habeis hecho... ¡Haz fotos para que podamos verlas en la pantalla!",
           thanksForComing: "¡Muchas gracias a todos por venir!"
@@ -44,7 +41,8 @@ i18n
           theWeddingOrganizer: "o planejador de casamento",
           errorSendingVideo: "O vídeo não pôde ser enviado",
           errorSendingPhoto: "A foto não pôde ser enviada",
-          uploading: 'Enviando foto.....',
+          uploading: 'Enviando.....',
+          uploaded: 'Recebido, obrigado!',
           info1: "Gostava que nos enviasse um vídeo com os seus melhores votos para recordar este momento especial para nós.",
           info2: "Se tu já fez isso... Tire fotos para que possamos vê-las na tela!",
           thanksForComing: "Muito obrigado a todos por terem vindo!"

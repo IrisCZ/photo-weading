@@ -19,42 +19,61 @@ function CameraWrapper() {
 
   const newLinkUrl = useCallback((isVideo = false) => encodeURI(`/new-photo-link?name=${name}&isVideo=${isVideo}`), [name])
 
-  const handleUploadPhoto = (photoSrc: Blob) => {
+  const handleUploadPhoto = async (photoSrc: Blob): Promise<string> => {
     return fetch(newLinkUrl()).then(async (result) => {
-      if (result.ok) {
-        const { link: url } = await result.json();
-        await fetch(url, {
-          method: "PUT",
-          headers: new Headers({
-            "Content-Type": "image/jpeg",
-          }),
-          body: photoSrc,
-        })
-          
-          .catch((e) => {
-            alert(t('errorSendingPhoto'));
-            console.error("Error:", e);
-          });
+      if (!result.ok){
+        return `error: ${result.status}: ${result.statusText}`
       }
+      const { link: url } = await result.json();
+      return await fetch(url, {
+        method: "PUT",
+        headers: new Headers({
+          "Content-Type": "image/jpeg",
+        }),
+        body: photoSrc,
+      }).then(result => {
+        if (!result.ok){
+          return `error: ${result.status}: ${result.statusText}`
+        }
+        return "";
+      }).catch((e: Error) => {
+        alert(t('errorSendingPhoto'));
+        console.error("Error:", e);
+        return e.message;
+      });
+    }).catch((e: Error) => {
+      alert(t('errorSendingPhoto'));
+      console.error("Error:", e);
+      return e.message
     });
   };
 
-  const handleUploadVideo = (videoSrc: Blob) => {
+  const handleUploadVideo = async (videoSrc: Blob): Promise<string> => {
     return fetch(newLinkUrl(true)).then(async (result) => {
-      if (result.ok) {
-        const { link: url } = await result.json();
-        await fetch(url, {
-          method: "PUT",
-          headers: new Headers({
-            "Content-Type": "video/webm",
-          }),
-          body: videoSrc,
-        }).catch((e) => {
-          alert(t('errorSendingVideo'));
-          console.error("Error:", e);
-        });
+      if (!result.ok){
+        return `error: ${result.status}: ${result.statusText}`
       }
-    });
+      const { link: url } = await result.json();
+      return await fetch(url, {
+        method: "PUT",
+        headers: new Headers({
+          "Content-Type": "video/webm",
+        }),
+        body: videoSrc,
+      }).then(result => {
+        if (!result.ok){
+          return `error: ${result.status}: ${result.statusText}`
+        }
+        return "";
+      }).catch((e: Error) => {
+        alert(t('errorSendingVideo'));
+        console.error("Error:", e);
+        return e.message;
+      });
+    }).catch((e:Error) => {
+      alert(t('errorSendingVideo'));
+      return e.message
+    });;
   };
 
   return name ? (
