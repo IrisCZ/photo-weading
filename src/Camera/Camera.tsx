@@ -16,35 +16,44 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
   const [pictureContent, setPictureContent] = useState<Blob | null>();
   const [videoContent, setVideoContent] = useState<Blob | null>();
   const [video, setVideo] = useState<string>();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const upload = useCallback(async () => {
     if (pictureContent) {
       setUploading(true);
       onUploadPhoto(pictureContent).then((error: string) => {
-        if(error){
-          alert(`${t('errorSendingPhoto')}: ${error}`)
+        if (error) {
+          alert(`${t("errorSendingPhoto")}: ${error}`);
         }
       });
-      setUploading(false);
-      URL.revokeObjectURL(picture!);
-      setPicture("");
-      setPictureContent(null);
+      setTimeout(() => {
+        setUploading(false);
+        URL.revokeObjectURL(picture!);
+        setPicture("");
+        setPictureContent(null);
+      }, 1000);
     }
     if (videoContent) {
       setUploading(true);
       onUploadVideo(videoContent).then((error: string) => {
-        if(error){
-          alert(`${t('errorSendingVideo')}: ${error}`)
+        if (error) {
+          alert(`${t("errorSendingVideo")}: ${error}`);
         }
       });
       setUploading(false);
       URL.revokeObjectURL(video!);
       setVideo("");
       setVideoContent(null);
-      
     }
-  }, [onUploadPhoto, onUploadVideo, picture, pictureContent, t, video, videoContent]);
+  }, [
+    onUploadPhoto,
+    onUploadVideo,
+    picture,
+    pictureContent,
+    t,
+    video,
+    videoContent,
+  ]);
 
   useEffect(() => {
     videoUploadRef.current?.addEventListener("change", (e) => {
@@ -99,10 +108,10 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
         </button>
       </>
     );
-  }, [picture, t, upload, uploading, video]);
+  }, [picture, upload, video]);
 
   return (
-    <section className={`camera`}>
+    <section className={picture ? "sending-section" : "capturing-section"}>
       <input
         type="file"
         accept="video/*"
@@ -117,30 +126,24 @@ function Camera({ onUploadPhoto, onUploadVideo, organizer }: CameraProps) {
         style={{ display: "none" }}
         ref={pictureUploadRef}
       />
-      {(!picture && !video) && (
+      {!picture && !video && (
         <section className="text-container">
-          <p>{t('info1')}</p>
-          <p>{t('info2')}</p>
+          <p>{t("info1")}</p>
+          <p>{t("info2")}</p>
         </section>
       )}
-      {picture && (
-        <img
-          src={picture}
-          alt="user"
-          style={{
-            width: "100%",
-            height: "auto",
-            position: "absolute",
-          }}
-        ></img>
-      )}
+      {picture && <img src={picture} alt="user" className=""></img>}
       {video && <video src={video} autoPlay width={"100%"} controls></video>}
       <footer className="camera-buttons">
         {buttons}
-        <div className="text-container">
-          { uploading ? <>{t('uploading')}</> : null }
-          {!video && !picture && !uploading ? <p>{t('thanksForComing')} 💗</p> : null }
-        </div> 
+        <>
+          {uploading ? (
+            <div className="text-container">{t("uploading")}</div>
+          ) : null}
+          {!video && !picture && !uploading ? (
+            <div className="text-container">{t("thanksForComing")} 💗</div>
+          ) : null}
+        </>
       </footer>
     </section>
   );
